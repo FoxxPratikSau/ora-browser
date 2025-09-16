@@ -33,6 +33,13 @@ struct LauncherView: View {
         }
     }
 
+    /// Submits the launcher input: either navigates the active tab (when editing the current URL) or performs a search and opens a new tab.
+    /// 
+    /// If `newInput` is provided it is used; otherwise the current `input` state is used.
+    /// - When `isEditingCurrentURL` is true and there is an active tab, loads the resolved input into that tab, hides the launcher, resets `isEditingCurrentURL`, and returns.
+    /// - Otherwise, resolves an appropriate search engine (using an existing match or the default engine for the active container) and, if a search URL can be produced, opens a new tab for that URL. In all cases the launcher is hidden after processing.
+    /// - Parameters:
+    ///   - newInput: An optional input string to submit instead of the current launcher `input`.
     private func onSubmit(_ newInput: String? = nil) {
         let correctInput = newInput ?? input
 

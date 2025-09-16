@@ -107,6 +107,19 @@ struct LauncherMain: View {
         return input.range(of: regex, options: .regularExpression) != nil
     }
 
+    /// Updates the launcher suggestions based on the given input text.
+    ///
+    /// If `text` is empty (after trimming whitespace) the suggestions are reset to the default set.
+    /// Otherwise this function:
+    /// - queries history and open tabs for matches,
+    /// - assembles suggestions in an order that depends on `isEditingCurrentURL` (open tabs vs. URL/search first),
+    /// - schedules auto-complete suggestions to be fetched and inserted near the current suggestion list,
+    /// - appends matched history and AI suggestions where applicable,
+    /// - and sets `focusedElement` to the first suggestion (or a new UUID when none exist).
+    ///
+    /// Side effects:
+    /// - mutates `suggestions` and `focusedElement`,
+    /// - triggers an asynchronous auto-suggestions request (debounced) that will mutate `suggestions` when results arrive.
     func searchHandler(_ text: String) {
         guard !text.trimmingCharacters(in: .whitespaces).isEmpty else {
             suggestions = defaultSuggestions()
@@ -142,6 +155,13 @@ struct LauncherMain: View {
         focusedElement = suggestions.first?.id ?? UUID()
     }
 
+    /// Appends up to two "opened tab" suggestions for the given tabs to the local `suggestions` list.
+    /// 
+    /// Each appended suggestion will include the tab's title, URL, favicon info, and an action that activates the tab.
+    /// If the tab's WebView is not ready, the action first restores the tab's transient state (using the available managers and privacy flag) before activating it.
+    /// - Parameters:
+    ///   - tabs: Candidate tabs to create suggestions from; iteration stops once two suggestions have been added.
+    ///   - itemsCount: In/out counter of how many suggestion items have been added so far; incremented for each suggestion appended.
     private func appendOpenTabs(_ tabs: [Tab], itemsCount: inout Int) {
         for tab in tabs {
             if itemsCount >= 2 { break }
@@ -169,6 +189,15 @@ struct LauncherMain: View {
         }
     }
 
+    /// Appends a "open this URL" suggestion to `suggestions` when the input text represents a valid URL and the user is not currently editing the address bar.
+    /// 
+    /// If `isEditingCurrentURL` is true this function does nothing. Otherwise it:
+    /// - Attempts to parse `text` as a URL.
+    /// - If the parsed URL contains a scheme, uses it directly.
+    /// - If the parsed URL has no scheme but `text` is recognized as a valid URL, constructs a URL (e.g., by adding a scheme) and uses that.
+    /// - If a final URL is obtained, appends a `.suggestedLink` `LauncherSuggestion` whose action opens the URL in a new tab (using `tabManager`, `historyManager`, `downloadManager` and `privacyMode`).
+    /// 
+    /// - Parameter text: The current input string to evaluate for a direct-URL suggestion.
     private func appendOpenURLSuggestionIfNeeded(_ text: String) {
         if isEditingCurrentURL { return }
 

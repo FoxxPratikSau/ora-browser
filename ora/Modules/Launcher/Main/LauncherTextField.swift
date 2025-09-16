@@ -27,6 +27,14 @@ struct LauncherTextField: NSViewRepresentable {
         Coordinator(self)
     }
 
+    /// Creates and configures the AppKit text field used by this representable.
+    /// 
+    /// The returned CustomTextField is set up for single-line input and two-way binding:
+    /// - Delegate is wired to the representable's coordinator to forward text and command events.
+    /// - Appearance: uses the provided `font`, a rounded bezel style, no border, no focus ring, and no background drawing.
+    /// - Behavior: placeholder text is applied, maximumNumberOfLines is 1, wrapping is disabled, and horizontal scrolling is enabled so the field behaves as a single-line editor.
+    /// - Note: `context` is used to access the coordinator and set it as the field's delegate.
+    /// - Returns: A configured CustomTextField ready for insertion into the view hierarchy.
     func makeNSView(context: Context) -> CustomTextField {
         let textField = CustomTextField()
         textField.delegate = context.coordinator

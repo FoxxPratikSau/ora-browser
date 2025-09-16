@@ -137,6 +137,11 @@ struct SidebarURLDisplay: View {
         }
     }
 
+    /// Returns the string to display for the tab's URL in the sidebar.
+    /// 
+    /// If `appState.showFullURL` is true this returns the tab's full absolute URL string.
+    /// Otherwise it returns the URL's host (e.g., "example.com") when available, falling back to the absolute URL string if the host is missing.
+    /// - Returns: A display-ready URL string for the tab.
     private func getDisplayURL() -> String {
         if appState.showFullURL {
             return tab.url.absoluteString
