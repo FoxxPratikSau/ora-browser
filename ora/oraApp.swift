@@ -32,6 +32,8 @@ class AppState: ObservableObject {
     @Published var showFullURL: Bool = (UserDefaults.standard.object(forKey: "showFullURL") as? Bool) ?? true {
         didSet { UserDefaults.standard.set(showFullURL, forKey: "showFullURL") }
     }
+
+    @Published var addressBarFocusRequest: UUID = .init()
 }
 
 @main

@@ -209,15 +209,6 @@ struct URLBar: View {
                                     )
                             )
                     )
-                    .overlay(
-                        // Hidden button for keyboard shortcut
-                        Button("") {
-                            isEditing = true
-                        }
-                        .keyboardShortcut(KeyboardShortcuts.Address.focus)
-                        .opacity(0)
-                        .allowsHitTesting(false)
-                    )
 
                     ShareLinkButton(
                         isEnabled: true,
@@ -272,6 +263,9 @@ struct URLBar: View {
                     if let activeTab = tabManager.activeTab {
                         triggerCopy(activeTab.url.absoluteString)
                     }
+                }
+                .onReceive(appState.$addressBarFocusRequest) { _ in
+                    isEditing = true
                 }
                 .background(
                     Rectangle()

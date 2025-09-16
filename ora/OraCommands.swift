@@ -38,6 +38,11 @@ struct OraCommands: Commands {
                 NotificationCenter.default.post(name: .copyAddressURL, object: nil)
             }
             .keyboardShortcut(KeyboardShortcuts.Address.copyURL)
+
+            Button("Focus Address Bar") {
+                NotificationCenter.default.post(name: .focusAddressBarRequest, object: NSApp.keyWindow)
+            }
+            .keyboardShortcut(KeyboardShortcuts.Address.focus)
         }
 
         CommandGroup(replacing: .sidebar) {
