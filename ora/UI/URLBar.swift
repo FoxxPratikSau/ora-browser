@@ -10,6 +10,7 @@ struct URLBar: View {
     @State private var showCopiedAnimation = false
     @State private var startWheelAnimation = false
     @State private var editingURLString: String = ""
+    @State private var window: NSWindow?
     @FocusState private var isEditing: Bool
     @Environment(\.colorScheme) var colorScheme
 
@@ -264,7 +265,9 @@ struct URLBar: View {
                         triggerCopy(activeTab.url.absoluteString)
                     }
                 }
-                .onReceive(NotificationCenter.default.publisher(for: .focusAddressBar)) { _ in
+                .onReceive(NotificationCenter.default.publisher(for: .focusAddressBar)) { notification in
+                    // Only react to notifications from this window
+                    guard notification.object as? NSWindow === window else { return }
                     if let activeTab = tabManager.activeTab {
                         editingURLString = activeTab.url.absoluteString
                         isEditing = true
@@ -274,6 +277,7 @@ struct URLBar: View {
                     Rectangle()
                         .fill(tab.backgroundColor)
                 )
+                .background(WindowReader(window: $window))
             }
         }
     }
