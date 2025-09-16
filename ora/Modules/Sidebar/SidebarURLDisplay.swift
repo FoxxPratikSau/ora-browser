@@ -131,6 +131,10 @@ struct SidebarURLDisplay: View {
         .onReceive(NotificationCenter.default.publisher(for: .copyAddressURL)) { _ in
             triggerCopy(tab.url.absoluteString)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .focusAddressBar)) { _ in
+            isEditing = true
+            editingURLString = tab.url.absoluteString
+        }
     }
 
     private func getDisplayURL() -> String {
