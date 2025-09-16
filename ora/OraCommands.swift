@@ -40,7 +40,7 @@ struct OraCommands: Commands {
             .keyboardShortcut(KeyboardShortcuts.Address.copyURL)
 
             Button("Focus Address Bar") {
-                NotificationCenter.default.post(name: .focusAddressBar, object: NSApp.keyWindow)
+                NotificationCenter.default.post(name: .openLauncherWithURL, object: NSApp.keyWindow)
             }
             .keyboardShortcut(KeyboardShortcuts.Address.focus)
         }

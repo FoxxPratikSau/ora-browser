@@ -36,6 +36,9 @@ struct LauncherTextField: NSViewRepresentable {
         textField.focusRingType = .none
         textField.drawsBackground = false
         textField.placeholderString = placeholder
+        textField.maximumNumberOfLines = 1
+        textField.cell?.wraps = false
+        textField.cell?.isScrollable = true
         return textField
     }
 
