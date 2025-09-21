@@ -217,7 +217,8 @@ struct URLBar: View {
                     .overlay(
                         // Hidden button for keyboard shortcut
                         Button("") {
-                            isEditing = true
+                            // Post the openLauncherWithURL notification to open launcher with current URL
+                            NotificationCenter.default.post(name: .openLauncherWithURL, object: window)
                         }
                         .oraShortcut(KeyboardShortcuts.Address.focus)
                         .opacity(0)
