@@ -120,6 +120,14 @@ struct OraRoot: View {
                         appState.showLauncher.toggle()
                     }
                 }
+                NotificationCenter.default
+                    .addObserver(forName: .openLauncherWithURL, object: nil, queue: .main) { note in
+                        guard note.object as? NSWindow === window ?? NSApp.keyWindow else { return }
+                        if let activeTab = tabManager.activeTab {
+                            appState.launcherSearchText = activeTab.url.absoluteString
+                            appState.showLauncher = true
+                        }
+                    }
                 NotificationCenter.default.addObserver(forName: .closeActiveTab, object: nil, queue: .main) { note in
                     guard note.object as? NSWindow === window ?? NSApp.keyWindow else { return }
                     tabManager.closeActiveTab()

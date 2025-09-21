@@ -42,6 +42,7 @@ struct LauncherMain: View {
     var isFocused: FocusState<Bool>.Binding
     let onTabPress: () -> Void
     let onSubmit: (String?) -> Void
+    var isEditingCurrentURL: Bool = false
 
     @Environment(\.theme) private var theme
     @EnvironmentObject var historyManager: HistoryManager
@@ -121,9 +122,16 @@ struct LauncherMain: View {
         suggestions = []
 
         var itemsCount = 0
-        appendOpenTabs(tabs, itemsCount: &itemsCount)
-        appendOpenURLSuggestionIfNeeded(text)
-        appendSearchWithDefaultEngineSuggestion(text)
+
+        if isEditingCurrentURL {
+            appendOpenTabs(tabs, itemsCount: &itemsCount)
+            appendOpenURLSuggestionIfNeeded(text)
+            appendSearchWithDefaultEngineSuggestion(text)
+        } else {
+            appendOpenURLSuggestionIfNeeded(text)
+            appendSearchWithDefaultEngineSuggestion(text)
+            appendOpenTabs(tabs, itemsCount: &itemsCount)
+        }
 
         let insertIndex = suggestions.count
         requestAutoSuggestions(text, insertAt: insertIndex)
@@ -162,6 +170,8 @@ struct LauncherMain: View {
     }
 
     private func appendOpenURLSuggestionIfNeeded(_ text: String) {
+        if isEditingCurrentURL { return }
+
         guard let candidateURL = URL(string: text) else { return }
         let finalURL: URL? = if candidateURL.scheme != nil {
             candidateURL
@@ -302,7 +312,11 @@ struct LauncherMain: View {
                     font: NSFont.systemFont(ofSize: 18, weight: .medium),
                     onTab: onTabPress,
                     onSubmit: {
-                        executeCommand()
+                        if !suggestions.isEmpty, suggestions.contains(where: { $0.id == focusedElement }) {
+                            executeCommand()
+                        } else {
+                            onSubmit(nil)
+                        }
                     },
                     onDelete: {
                         if text.isEmpty, match != nil {

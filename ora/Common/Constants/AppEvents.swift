@@ -3,6 +3,8 @@ import Foundation
 extension Notification.Name {
     static let toggleSidebar = Notification.Name("ToggleSidebar")
     static let copyAddressURL = Notification.Name("CopyAddressURL")
+    static let focusAddressBar = Notification.Name("FocusAddressBar")
+    static let openLauncherWithURL = Notification.Name("OpenLauncherWithURL")
 
     static let showLauncher = Notification.Name("ShowLauncher")
     static let closeActiveTab = Notification.Name("CloseActiveTab")

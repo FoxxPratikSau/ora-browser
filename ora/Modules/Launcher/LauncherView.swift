@@ -15,6 +15,7 @@ struct LauncherView: View {
     @State private var isVisible = false
     @FocusState private var isTextFieldFocused: Bool
     @State private var match: LauncherMain.Match?
+    @State private var isEditingCurrentURL: Bool = false
 
     var clearOverlay: Bool? = false
 
@@ -34,6 +35,14 @@ struct LauncherView: View {
 
     private func onSubmit(_ newInput: String? = nil) {
         let correctInput = newInput ?? input
+
+        if isEditingCurrentURL, let activeTab = tabManager.activeTab {
+            activeTab.loadURL(correctInput)
+            appState.showLauncher = false
+            isEditingCurrentURL = false
+            return
+        }
+
         var engineToUse = match
 
         if engineToUse == nil,
@@ -73,6 +82,7 @@ struct LauncherView: View {
                         isVisible = false
                         DispatchQueue.main.async {
                             appState.showLauncher = false
+                            appState.launcherSearchText = ""
                         }
                     }
                 }
@@ -82,7 +92,8 @@ struct LauncherView: View {
                 match: $match,
                 isFocused: $isTextFieldFocused,
                 onTabPress: onTabPress,
-                onSubmit: onSubmit
+                onSubmit: onSubmit,
+                isEditingCurrentURL: isEditingCurrentURL
             )
             .gradientAnimatingBorder(
                 color: match?.faviconBackgroundColor ?? match?.color ?? .clear,
@@ -97,9 +108,27 @@ struct LauncherView: View {
                 isVisible = true
                 isTextFieldFocused = true
                 searchEngineService.setTheme(theme)
+                if !appState.launcherSearchText.isEmpty {
+                    input = appState.launcherSearchText
+                    isEditingCurrentURL = true
+                    match = nil
+                    appState.launcherSearchText = ""
+                }
             }
             .onChange(of: appState.showLauncher) { _, newValue in
                 isVisible = newValue
+                if newValue {
+                    if !appState.launcherSearchText.isEmpty {
+                        input = appState.launcherSearchText
+                        isEditingCurrentURL = true
+                        match = nil
+                        appState.launcherSearchText = ""
+                    }
+                } else {
+                    input = ""
+                    match = nil
+                    isEditingCurrentURL = false
+                }
             }
             // .onChange(of: theme) { _, newValue in
             //     searchEngineService.setTheme(newValue)
@@ -111,6 +140,8 @@ struct LauncherView: View {
                 isVisible = false
                 DispatchQueue.main.async {
                     appState.showLauncher = false
+                    appState.launcherSearchText = ""
+                    isEditingCurrentURL = false
                 }
             }
         }

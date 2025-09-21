@@ -78,9 +78,9 @@ struct SidebarView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(
             EdgeInsets(
-                top: isFullscreen ? 10 : 36,
+                top: isFullscreen ? 6 : 20,
                 leading: 0,
-                bottom: 10,
+                bottom: 6,
                 trailing: 0
             )
         )

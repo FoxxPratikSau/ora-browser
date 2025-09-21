@@ -10,6 +10,7 @@ struct URLBar: View {
     @State private var showCopiedAnimation = false
     @State private var startWheelAnimation = false
     @State private var editingURLString: String = ""
+    @State private var window: NSWindow?
     @FocusState private var isEditing: Bool
     @Environment(\.colorScheme) var colorScheme
 
@@ -200,8 +201,8 @@ struct URLBar: View {
                         .oraShortcutHelp("Copy URL", for: KeyboardShortcuts.Address.copyURL)
                         .accessibilityLabel(Text("Copy URL"))
                     }
-                    .frame(height: 30)
-                    .padding(.horizontal, 8)
+                    .frame(height: 28)
+                    .padding(.horizontal, 6)
                     .background(
                         RoundedRectangle(cornerRadius: 6, style: .continuous)
                             .fill(getUrlFieldColor(tab).opacity(0.12))
@@ -216,7 +217,8 @@ struct URLBar: View {
                     .overlay(
                         // Hidden button for keyboard shortcut
                         Button("") {
-                            isEditing = true
+                            // Post the openLauncherWithURL notification to open launcher with current URL
+                            NotificationCenter.default.post(name: .openLauncherWithURL, object: window)
                         }
                         .oraShortcut(KeyboardShortcuts.Address.focus)
                         .opacity(0)
@@ -277,10 +279,19 @@ struct URLBar: View {
                         triggerCopy(activeTab.url.absoluteString)
                     }
                 }
+                .onReceive(NotificationCenter.default.publisher(for: .focusAddressBar)) { notification in
+                    // Only react to notifications from this window
+                    guard notification.object as? NSWindow === window else { return }
+                    if let activeTab = tabManager.activeTab {
+                        editingURLString = activeTab.url.absoluteString
+                        isEditing = true
+                    }
+                }
                 .background(
                     Rectangle()
                         .fill(tab.backgroundColor)
                 )
+                .background(WindowReader(window: $window))
             }
         }
     }

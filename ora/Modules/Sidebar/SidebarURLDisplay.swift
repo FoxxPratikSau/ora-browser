@@ -12,6 +12,7 @@ struct SidebarURLDisplay: View {
     @FocusState private var isEditing: Bool
     @State private var showCopiedAnimation = false
     @State private var startWheelAnimation = false
+    @State private var window: NSWindow?
 
     init(tab: Tab, editingURLString: Binding<String>) {
         self.tab = tab
@@ -94,8 +95,8 @@ struct SidebarURLDisplay: View {
                 .opacity(0)
             )
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 4)
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
         .onTapGesture {
@@ -131,6 +132,13 @@ struct SidebarURLDisplay: View {
         .onReceive(NotificationCenter.default.publisher(for: .copyAddressURL)) { _ in
             triggerCopy(tab.url.absoluteString)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .focusAddressBar)) { notification in
+            // Only react to notifications from this window
+            guard notification.object as? NSWindow === window else { return }
+            isEditing = true
+            editingURLString = tab.url.absoluteString
+        }
+        .background(WindowReader(window: $window))
     }
 
     private func getDisplayURL() -> String {
