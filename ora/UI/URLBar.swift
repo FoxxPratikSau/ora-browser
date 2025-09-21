@@ -197,8 +197,8 @@ struct URLBar: View {
                         .help("Copy URL (⇧⌘C)")
                         .accessibilityLabel(Text("Copy URL"))
                     }
-                    .frame(height: 30)
-                    .padding(.horizontal, 8)
+                    .frame(height: 28)
+                    .padding(.horizontal, 6)
                     .background(
                         RoundedRectangle(cornerRadius: 6, style: .continuous)
                             .fill(getUrlFieldColor(tab).opacity(0.12))

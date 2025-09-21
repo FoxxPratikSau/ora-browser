@@ -1,0 +1,287 @@
+---
+description: Project-wide coding standards and best practices for Ora Browser
+alwaysApply: true
+---
+
+# Project Standards
+
+## Overview
+
+This rule defines the overarching coding standards and best practices for the Ora Browser project. These standards apply across all components and ensure consistency, quality, and maintainability.
+
+## Code Organization
+
+### 1. Directory Structure
+```
+ora/
+├── App.swift                    # Application entry point
+├── OraRoot.swift               # Root view and state management
+├── Models/                     # SwiftData models
+├── Services/                   # Business logic and coordination
+├── UI/                         # Reusable UI components
+├── Modules/                    # Feature-specific modules
+├── Common/                     # Shared utilities and extensions
+├── Resources/                  # Static assets and scripts
+└── Preview Content/            # SwiftUI previews
+```
+
+### 2. File Naming
+- Use PascalCase for Swift types (structs, classes, enums)
+- Use camelCase for functions, variables, and properties
+- Use UPPER_SNAKE_CASE for static constants
+- Use lowercase with hyphens for file names
+- Group related functionality in single files
+
+### 3. Import Organization
+```swift
+import Foundation
+import SwiftUI
+import WebKit
+import SwiftData
+
+// Third-party imports
+import AppKit
+
+// Project imports
+import Common
+```
+
+## Documentation
+
+### 1. Code Documentation
+- Use triple-slash comments for public APIs
+- Document complex logic with inline comments
+- Add MARK comments for logical separation
+- Document parameters and return values
+
+```swift
+/// Creates a new tab with the specified configuration
+/// - Parameters:
+///   - title: The tab title
+///   - url: The initial URL to load
+///   - container: The container to add the tab to
+/// - Returns: The newly created tab
+func addTab(title: String, url: URL, container: TabContainer) -> Tab {
+    // Implementation
+}
+```
+
+### 2. File Headers
+Add descriptive headers to complex files:
+```swift
+//
+// TabManager.swift
+// Ora Browser
+//
+// Manages tab lifecycle and state
+// Handles tab creation, switching, and organization
+//
+
+import Foundation
+import SwiftData
+```
+
+## Error Handling
+
+### 1. Error Types
+```swift
+enum TabError: LocalizedError {
+    case invalidURL(String)
+    case webViewNotReady
+    case navigationFailed(Error)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidURL(let url):
+            return "Invalid URL: \(url)"
+        case .webViewNotReady:
+            return "WebView is not ready"
+        case .navigationFailed(let error):
+            return "Navigation failed: \(error.localizedDescription)"
+        }
+    }
+}
+```
+
+### 2. Error Propagation
+- Use throwing functions for operations that can fail
+- Handle errors gracefully in UI components
+- Provide user-friendly error messages
+- Log errors for debugging
+
+```swift
+do {
+    let result = try performOperation()
+    // Handle success
+} catch {
+    // Handle error gracefully
+    showErrorMessage(error.localizedDescription)
+    logger.error("Operation failed: \(error)")
+}
+```
+
+## Performance
+
+### 1. Memory Management
+- Clean up resources in `deinit` methods
+- Use weak references to avoid retain cycles
+- Monitor memory usage in performance-critical code
+- Implement proper cleanup for WebKit views
+
+### 2. Async Operations
+- Use `Task` for async operations
+- Avoid blocking the main thread
+- Use `MainActor` for UI updates
+- Handle cancellation appropriately
+
+### 3. View Optimization
+- Use `@ViewBuilder` for conditional views
+- Avoid deep view hierarchies
+- Use `EquatableView` for performance
+- Optimize SwiftUI view updates
+
+## Security
+
+### 1. Input Validation
+- Validate all user input
+- Sanitize URLs and search queries
+- Handle malicious input gracefully
+- Follow OWASP guidelines
+
+### 2. WebKit Security
+- Configure WebKit securely
+- Handle content security policies
+- Implement proper sandboxing
+- Validate JavaScript interactions
+
+### 3. Data Protection
+- Secure sensitive data handling
+- Implement proper encryption where needed
+- Follow macOS security best practices
+- Respect user privacy
+
+## Accessibility
+
+### 1. UI Accessibility
+- Add accessibility labels and hints
+- Support keyboard navigation
+- Ensure proper focus management
+- Test with assistive technologies
+
+### 2. Screen Reader Support
+```swift
+.accessibilityLabel(Text("Navigate back"))
+.accessibilityHint(Text("Go to previous page"))
+.keyboardShortcut(.defaultAction)
+```
+
+### 3. Color and Contrast
+- Use sufficient color contrast ratios
+- Support high contrast mode
+- Avoid color-only information
+- Test with color blindness
+
+## Testing
+
+### 1. Test Coverage
+- Write tests for all public APIs
+- Test error conditions and edge cases
+- Validate user workflows
+- Test performance-critical code
+
+### 2. Test Organization
+- Use descriptive test method names
+- Follow Arrange-Act-Assert pattern
+- Clean up test data
+- Document complex test scenarios
+
+## Git and Version Control
+
+### 1. Commit Messages
+Use conventional commit format:
+```
+fix: resolve tab switching bug
+feat: add search suggestions
+refactor: optimize tab manager performance
+test: add unit tests for history service
+docs: update API documentation
+```
+
+### 2. Branch Naming
+- Use descriptive branch names
+- Follow feature/issue-number format
+- Keep branch names concise but descriptive
+
+### 3. Code Review
+- Ensure all tests pass
+- Follow coding standards
+- Test changes thoroughly
+- Update documentation as needed
+
+## Build and Release
+
+### 1. Build Configuration
+- Use appropriate compiler flags
+- Configure build settings for different environments
+- Optimize for release builds
+
+### 2. Dependencies
+- Keep dependencies up to date
+- Use semantic versioning
+- Document dependency requirements
+
+## Platform Integration
+
+### 1. macOS Features
+- Use macOS-specific APIs appropriately
+- Handle system events and notifications
+- Support macOS accessibility features
+- Integrate with system services
+
+### 2. AppKit Integration
+- Use AppKit for system-level functionality
+- Handle window management properly
+- Implement proper menu integration
+- Support system keyboard shortcuts
+
+## Quality Assurance
+
+### 1. Code Quality
+- Follow Swift style guidelines
+- Use consistent naming conventions
+- Maintain clean, readable code
+- Remove unused code and imports
+
+### 2. Performance Monitoring
+- Monitor app performance metrics
+- Identify and fix performance bottlenecks
+- Optimize resource usage
+- Test on different hardware configurations
+
+### 3. User Experience
+- Test on different macOS versions
+- Validate UI on different screen sizes
+- Test with different input methods
+- Ensure smooth animations and transitions
+
+## Maintenance
+
+### 1. Code Cleanup
+- Remove commented-out code
+- Clean up unused imports
+- Optimize code for readability
+- Update documentation
+
+### 2. Dependency Updates
+- Keep frameworks and libraries updated
+- Test changes thoroughly
+- Update build configurations as needed
+- Validate compatibility
+
+### 3. Refactoring
+- Identify code smells and technical debt
+- Plan refactoring efforts
+- Test refactoring changes thoroughly
+- Document architectural changes
+
+These project standards ensure consistent, high-quality development across the entire Ora Browser codebase.

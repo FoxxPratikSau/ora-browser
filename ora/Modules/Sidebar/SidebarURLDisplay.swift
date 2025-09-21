@@ -95,8 +95,8 @@ struct SidebarURLDisplay: View {
                 .opacity(0)
             )
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 10)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 4)
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
         .onTapGesture {

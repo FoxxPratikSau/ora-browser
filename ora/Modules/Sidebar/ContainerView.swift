@@ -46,12 +46,12 @@ struct ContainerView: View {
                         .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
-                .padding()
+                .padding(6)
                 .background(
                     RoundedRectangle(cornerRadius: 12)
                         .fill(Color.gray.opacity(0.1))
                 )
-                .padding(.horizontal)
+                .padding(.horizontal, 6)
             }
 
             VerticalScrollView {

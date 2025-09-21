@@ -1,0 +1,320 @@
+---
+description: UI component development guidelines for Ora Browser
+globs: ora/UI/*.swift,ora/Modules/**/*.swift
+alwaysApply: true
+---
+
+# UI Components
+
+## Overview
+
+UI components in Ora Browser are built with SwiftUI and organized in the `ora/UI/` directory and `ora/Modules/` directory. Components follow SwiftUI best practices and integrate with the service layer for functionality.
+
+## Component Architecture
+
+### 1. Main Browser Interface
+
+**BrowserView** (`Modules/Browser/BrowserView.swift`):
+- Central browser interface component
+- Manages sidebar, content area, and floating components
+- Handles fullscreen and sidebar visibility states
+- Coordinates between different UI modules
+
+**Key Features**:
+- HSplit layout with resizable sidebar
+- Floating sidebar support with autohide
+- Overlay management for launcher and tab switcher
+- Theme-aware background and styling
+
+### 2. URL Bar (`UI/URLBar.swift`)
+
+**Purpose**: Address bar with search and navigation functionality
+
+**Components**:
+- Navigation buttons (back, forward, reload, sidebar toggle)
+- URL field with editing capabilities
+- Security indicators and loading states
+- Share button and menu
+
+**Features**:
+- Full URL display toggle
+- Copy URL with animation feedback
+- Keyboard shortcuts support
+- Dynamic theming based on page colors
+
+**Usage**:
+```swift
+URLBar(onSidebarToggle: { toggleSidebar() })
+    .environmentObject(tabManager)
+    .environmentObject(appState)
+```
+
+### 3. Web View (`UI/WebView.swift`)
+
+**Purpose**: Display web content with WebKit integration
+
+**Features**:
+- WebKit view container
+- Loading progress indication
+- Error handling with retry options
+- Link preview on hover
+- Find in page functionality
+
+**Integration**:
+- Uses tab.webView for content
+- Handles navigation errors gracefully
+- Shows loading states and progress
+
+### 4. Sidebar System (`Modules/Sidebar/`)
+
+**Purpose**: Vertical navigation and tab management
+
+**Components**:
+- Collapsible sidebar with sections
+- Tab container management
+- Tab search and filtering
+- Settings and preferences access
+
+**Features**:
+- Resizable width with persistence
+- Autohide functionality
+- Floating mode support
+- Keyboard navigation
+
+### 5. Launcher (`Modules/Launcher/`)
+
+**Purpose**: Quick access search and navigation
+
+**Features**:
+- Search across tabs, bookmarks, history
+- AI chat integration
+- Customizable shortcuts
+- Quick actions and commands
+
+**Integration**:
+- Works with SearchEngineService
+- Supports multiple search engines
+- Provides suggestions and auto-completion
+
+### 6. Tab Switcher (`Modules/TabSwitch/`)
+
+**Purpose**: Floating tab switcher overlay
+
+**Features**:
+- Visual tab preview
+- Keyboard shortcut activation (Ctrl+Tab)
+- Tab organization and management
+- Quick tab closing
+
+## UI Patterns
+
+### 1. Environment Integration
+```swift
+struct MyComponent: View {
+    @EnvironmentObject var tabManager: TabManager
+    @EnvironmentObject var appState: AppState
+    @Environment(\.theme) var theme
+
+    var body: some View {
+        // Component implementation
+    }
+}
+```
+
+### 2. Custom Modifiers
+- Use custom modifiers for reusable UI patterns
+- Follow established modifier patterns
+- Create modifiers for common animations and effects
+
+### 3. Theme Integration
+```swift
+.background(theme.background)
+.foregroundColor(theme.foreground)
+.overlay(
+    RoundedRectangle(cornerRadius: 8)
+        .stroke(theme.borderColor, lineWidth: 1)
+)
+```
+
+### 4. Animation Patterns
+- Use spring animations for sidebar transitions
+- Apply ease-out animations for UI feedback
+- Use asymmetric animations for state changes
+
+## Component Guidelines
+
+### 1. View Composition
+- Build composable, reusable components
+- Use clear component boundaries
+- Maintain separation of concerns
+
+### 2. State Management
+- Use @State for local component state
+- Use @EnvironmentObject for shared state
+- Avoid complex state in view structs
+
+### 3. Performance
+- Use @ViewBuilder for conditional views
+- Optimize view hierarchy depth
+- Avoid unnecessary view recreations
+
+### 4. Accessibility
+- Add accessibility labels and hints
+- Support keyboard navigation
+- Ensure proper focus management
+- Test with assistive technologies
+
+## Specific Component Patterns
+
+### 1. Button Components
+```swift
+struct URLBarButton: View {
+    let systemName: String
+    let isEnabled: Bool
+    let foregroundColor: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .foregroundColor(isEnabled ? foregroundColor : .gray)
+        }
+        .buttonStyle(.plain)
+        .disabled(!isEnabled)
+    }
+}
+```
+
+### 2. List Components
+```swift
+struct TabListView: View {
+    @Query(sort: \Tab.lastAccessedAt, order: .reverse) var tabs: [Tab]
+
+    var body: some View {
+        List(tabs) { tab in
+            TabItem(tab: tab)
+                .onTapGesture {
+                    tabManager.activateTab(tab)
+                }
+        }
+    }
+}
+```
+
+### 3. Overlay Components
+```swift
+struct FloatingComponent: View {
+    @EnvironmentObject var appState: AppState
+
+    var body: some View {
+        if appState.showComponent {
+            ComponentView()
+                .transition(.opacity)
+                .zIndex(100)
+        }
+    }
+}
+```
+
+### 4. Custom Text Fields
+```swift
+struct CustomTextField: View {
+    @Binding var text: String
+    @FocusState var isFocused: Bool
+    let placeholder: String
+
+    var body: some View {
+        TextField(placeholder, text: $text)
+            .focused($isFocused)
+            .textFieldStyle(.plain)
+            .onKeyPress(.escape) {
+                isFocused = false
+                return .handled
+            }
+    }
+}
+```
+
+## Animation and Transitions
+
+### 1. Sidebar Animations
+```swift
+.withAnimation(.spring(response: 0.2, dampingFraction: 1.0)) {
+    sidebarVisibility.toggle(.primary)
+}
+```
+
+### 2. Button Feedback
+```swift
+.transition(.asymmetric(
+    insertion: .push(from: .top),
+    removal: .push(from: .bottom)
+))
+```
+
+### 3. Loading States
+```swift
+if isLoading {
+    ProgressView()
+        .scaleEffect(0.5)
+        .transition(.opacity)
+}
+```
+
+## Error Handling in UI
+
+### 1. Navigation Errors
+- Show user-friendly error pages
+- Provide retry and go-back options
+- Handle different error types appropriately
+
+### 2. Loading States
+- Show progress indicators
+- Handle loading failures gracefully
+- Provide user feedback
+
+### 3. Empty States
+- Design meaningful empty states
+- Provide clear actions for empty scenarios
+- Maintain consistent styling
+
+## Testing UI Components
+
+### 1. SwiftUI Previews
+- Use #Preview for component testing
+- Test different states and configurations
+- Validate accessibility features
+
+### 2. Integration Testing
+- Test component interactions
+- Validate data flow
+- Test error scenarios
+
+### 3. Performance Testing
+- Test component rendering performance
+- Validate animation smoothness
+- Check memory usage
+
+## Best Practices
+
+### 1. Component Naming
+- Use descriptive, self-documenting names
+- Follow SwiftUI naming conventions
+- Use clear component boundaries
+
+### 2. Documentation
+- Document complex component logic
+- Add comments for non-obvious behavior
+- Document public interfaces
+
+### 3. Reusability
+- Build reusable, configurable components
+- Use composition over inheritance
+- Create component variants through modifiers
+
+### 4. Theme Consistency
+- Use theme environment for colors
+- Support light and dark modes
+- Maintain consistent spacing and sizing
+
+These rules ensure consistent, high-quality UI component development in the Ora Browser codebase.
