@@ -46,7 +46,7 @@ struct OraCommands: Commands {
             Button("Focus Address Bar") {
                 NotificationCenter.default.post(name: .openLauncherWithURL, object: NSApp.keyWindow)
             }
-            .keyboardShortcut(KeyboardShortcuts.Address.focus)
+            .keyboardShortcut(KeyboardShortcuts.Address.focus.keyboardShortcut)
         }
 
         CommandGroup(replacing: .sidebar) {
