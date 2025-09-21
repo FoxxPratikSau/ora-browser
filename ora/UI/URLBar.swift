@@ -76,6 +76,7 @@ struct URLBar: View {
                         foregroundColor: buttonForegroundColor,
                         action: onSidebarToggle
                     )
+                    .oraShortcutHelp("Toggle Sidebar", for: KeyboardShortcuts.App.toggleSidebar)
 
                     // Back button
                     URLBarButton(
@@ -88,7 +89,8 @@ struct URLBar: View {
                             }
                         }
                     )
-                    .keyboardShortcut(KeyboardShortcuts.Navigation.back)
+                    .oraShortcut(KeyboardShortcuts.Navigation.back)
+                    .oraShortcutHelp("Go Back", for: KeyboardShortcuts.Navigation.back)
 
                     // Forward button
                     URLBarButton(
@@ -101,7 +103,8 @@ struct URLBar: View {
                             }
                         }
                     )
-                    .keyboardShortcut(KeyboardShortcuts.Navigation.forward)
+                    .oraShortcut(KeyboardShortcuts.Navigation.forward)
+                    .oraShortcutHelp("Go Forward", for: KeyboardShortcuts.Navigation.forward)
 
                     // Reload button
                     URLBarButton(
@@ -114,7 +117,8 @@ struct URLBar: View {
                             }
                         }
                     )
-                    .keyboardShortcut(KeyboardShortcuts.Navigation.reload)
+                    .oraShortcut(KeyboardShortcuts.Navigation.reload)
+                    .oraShortcutHelp("Reload This Page", for: KeyboardShortcuts.Navigation.reload)
 
                     // URL field
                     HStack(spacing: 8) {
@@ -194,7 +198,7 @@ struct URLBar: View {
                                 .frame(width: 16, height: 16)
                         }
                         .buttonStyle(.plain)
-                        .help("Copy URL (⇧⌘C)")
+                        .oraShortcutHelp("Copy URL", for: KeyboardShortcuts.Address.copyURL)
                         .accessibilityLabel(Text("Copy URL"))
                     }
                     .frame(height: 28)
@@ -209,6 +213,15 @@ struct URLBar: View {
                                         lineWidth: 1.2
                                     )
                             )
+                    )
+                    .overlay(
+                        // Hidden button for keyboard shortcut
+                        Button("") {
+                            isEditing = true
+                        }
+                        .oraShortcut(KeyboardShortcuts.Address.focus)
+                        .opacity(0)
+                        .allowsHitTesting(false)
                     )
 
                     ShareLinkButton(
